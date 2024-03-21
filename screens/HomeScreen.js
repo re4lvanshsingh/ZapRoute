@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, PermissionsAndroid,Linking,TextInput } from 'react-native'
-import React,{useRef,useState,useEffect} from 'react'
+import { StyleSheet, Text, View, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import React,{useRef,useState,useEffect,createRef} from 'react'
 import tw from 'twrnc';
 import NavOptions from '../components/NavOptions.js';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -14,6 +14,11 @@ import NetInfo from "@react-native-community/netinfo";
 import OfflineNotification from '../components/Offline.js';
 import { Permissions } from 'expo';
 import * as Location from 'expo-location';
+import create from '@ant-design/icons/lib/components/IconFont.js';
+import { Dimensions } from 'react-native';
+import { ScreenHeight, ScreenWidth } from 'react-native-elements/dist/helpers/index.js';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 //Function to request access to current location of user (GPS):
 const requestLocationPermission = async () => {
@@ -50,6 +55,7 @@ const HomeScreen = () => {
     //==================================================================================================
 
     //For accessing location:
+
     const getLocation = async (id) => {
         await requestLocationPermission();
         try {
@@ -58,8 +64,12 @@ const HomeScreen = () => {
             
             //for debugging
             //console.log('Current location:', latitude, longitude);
+
             const texts="Current Location";
+            googleRef.current.setAddressText("Current Location");
+
             handleInputChange(id,latitude,longitude,texts);
+
         } catch(error){
             console.error('Error getting current location:', error);
         }
@@ -74,6 +84,7 @@ const HomeScreen = () => {
 
     //contains the information of responseData
     const [responseData, setResponseData] = useState([]);
+
 
     const dispatch = useDispatch();
 
@@ -132,9 +143,76 @@ const HomeScreen = () => {
     
     setTextInputs(updatedInputs);
 };
-  
+
+const googleRef=useRef(null);
+
+const renderItem = ({ item }) => (
+    <View key={item.id} style={styles.textInputRow}>
+      <GooglePlacesAutocomplete
+        ref={(item.id === textInputs[0].id) ? googleRef : null}
+        placeholder={(item.id === textInputs[0].id) ? 'Start' : 'Where To?'}
+        styles={{
+          container: {
+            flex: 1,
+          },
+          textInput: {
+            fontSize: 18,
+            height: 40,
+            borderWidth: 1,
+            borderColor: 'gray',
+            marginLeft: 20,
+            marginTop: 8,
+          },
+        }}
+        onPress={(data, details) => {
+          handleInputChange(item.id, details.geometry.location.lat, details.geometry.location.lng, data.description);
+        }}
+        fetchDetails={true}
+        returnKeyType={"search"}
+        enablePoweredByContainer={false}
+        minLength={2}
+        query={{
+          key: GOOGLE_MAPS_APIKEY,
+          language: "en"
+        }}
+        nearbyPlacesAPI='GooglePlacesSearch'
+        debounce={400}
+      />
+
+      <View>
+        <TouchableOpacity onPress={() => removeTextInput(item.id)}
+          style={{
+            marginLeft: 10,
+          }}
+        >
+          <Icon
+            style={tw `rounded-full `}
+            name="remove-circle"
+            type="ionicon"
+            colors="white"
+            size={30}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={[tw `flex-row items-center p-5`]}
+        onPress={() => getLocation(item.id)}>
+        {item.id === textInputs[0].id &&
+          <Icon
+            style={tw `rounded-full bg-gray-300 p-1`}
+            name="location"
+            disabled={item.id !== textInputs[0].id}
+            type="ionicon"
+            colors="white"
+            size={18}
+          />
+        }
+      </TouchableOpacity>
+    </View>
+  );
 
     return (
+        
     <SafeAreaView style={tw `bg-white flex-1`}>
         <View style={tw `p-5`}>
             {/* The name of our app - ZapRoute (an efficient way to route between cities) */}
@@ -143,70 +221,16 @@ const HomeScreen = () => {
             {/* This is for the options section - Ride / Get Food (future addition) */}
         </View>
 
-        <View style={styles.textInputsContainer}>
-        {textInputs.map((input) => (
-            <View key={input.id} style={styles.textInputRow}>
+        <View style={{flex:1}}>
+        <FlatList
+      data={textInputs}
+      renderItem={renderItem}
+      keyExtractor={item => item.id.toString()}
+    />
 
-                <GooglePlacesAutocomplete
-                placeholder='Where From?'
-                styles={{
-                    container: {
-                    flex: 1,  // Ensure the autocomplete container takes up all available space
-                    },
-                    textInput: {
-                    fontSize: 18,
-                    height: 40, // Set a specific height to avoid it being too small
-                    borderWidth: 1, // Add border to improve visibility
-                    borderColor: 'gray', // Add border color to improve visibility
-                    marginLeft: 20,
-                    marginTop: 0,
-                    },
-                }}
-                onPress={(data, details) => {
-                    // Handle selection here
-                    handleInputChange(input.id,details.geometry.location.lat,details.geometry.location.lng,data.description);
-                }}
-                fetchDetails={true}
-                returnKeyType={"search"}
-                enablePoweredByContainer={false}
-                minLength={2}
-                query={{
-                    key: GOOGLE_MAPS_APIKEY,
-                    language: "en"
-                }}
-                nearbyPlacesAPI='GooglePlacesSearch'
-                debounce={400}
-                />
-
-                <TouchableOpacity onPress={() => removeTextInput(input.id)}
-                    style={{
-                        marginLeft: 5,
-                    }}
-                >
-                    <Icon
-                    style={tw `rounded-full`}
-                    name="remove-circle"
-                    type="ionicon"
-                    colors="white"
-                    size={30}
-                />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={tw `flex-row items-center p-5`}
-                onPress={()=>getLocation(input.id)}>
-                <Icon
-                    style={tw `rounded-full bg-gray-300 p-1`}
-                    name="location"
-                    type="ionicon"
-                    colors="white"
-                    size={18}
-                /> 
-            </TouchableOpacity>
-
-            </View>
-        ))}
-
-        <TouchableOpacity onPress={addTextInput} style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+        <TouchableOpacity onPress={() => {
+    addTextInput();
+}} style={{position:'relative',paddingBottom:30,paddingLeft:3}}>
             
         <Icon
                     style={tw `rounded-full`}
@@ -220,7 +244,7 @@ const HomeScreen = () => {
       </View>
 
     
-      <View style={styles.container}>
+      <View style={{position:'relative', paddingBottom:ScreenHeight*0.15, alignContent:'center',paddingLeft:ScreenWidth*0.4}}>
       <NavOptions sendDataToBackend={sendDataToBackend} textInputs={textInputs}/>
     </View>
 
@@ -255,6 +279,7 @@ const HomeScreen = () => {
             <OfflineNotification/>
         </View>}
     </SafeAreaView>
+    
   )
 }
 
@@ -266,11 +291,13 @@ const styles = StyleSheet.create({
       padding: 20,
     },
     textInputsContainer: {
+        flex: 1,
       marginBottom: 10,
     },
     textInputRow: {
       flexDirection: 'row',
       alignItems: 'center',
+      padding: 3
     },
     textInput: {
       flex: 1,

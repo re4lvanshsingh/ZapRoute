@@ -3,14 +3,28 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import tw from 'twrnc'
 
-const CityDrawer = ({ currentCity, nextCity, distance, time, color }) => {
+const CityDrawer = ({ currentCity, nextCity, distance, time, currentColor, nextColor }) => {
 
 
   return (
    <View style={{flexDirection: 'row' }}>
         <View style={{flexDirection: 'column',justifyContent:'center',alignContent:'center'}}>
                 <Icon
-                    style={[tw`rounded-full p-1`, { backgroundColor: color }]}
+                    style={[tw`rounded-full p-1`, { backgroundColor: currentColor }]}
+                    name="location"
+                    type="ionicon"
+                    colors="white"
+                    size={18}
+                />
+                <Icon
+                    style={[tw`rounded-full p-1`, { marginTop: 3 }]}
+                    name="arrow-down"
+                    type="ionicon"
+                    colors="white"
+                    size={18}
+                /> 
+                <Icon
+                    style={[tw`rounded-full p-1`, { backgroundColor: nextColor, marginTop: 3 }]}
                     name="location"
                     type="ionicon"
                     colors="white"

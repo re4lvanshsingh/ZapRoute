@@ -24,6 +24,10 @@ const NavOptions = ({sendDataToBackend,textInputs}) => {
         navigation.navigate("MapScreen");
     }
 
+    const checker = () => {
+        return textInputs.every(({ latitude }) => latitude !== '');
+    };
+
   return (
     <FlatList
         data={data}
@@ -32,20 +36,15 @@ const NavOptions = ({sendDataToBackend,textInputs}) => {
         renderItem={({item}) => (
             <TouchableOpacity
             onPress={combine}
-            disabled={!textInputs.length || (textInputs.length>=1 && textInputs[0].latitude==='')}
+            disabled={!textInputs.length || (textInputs.length>=1 && !checker())}
             >
-                <View style={tw `${(!textInputs.length || (textInputs.length>=1 && textInputs[0].latitude==='')) && "opacity-20"}`}>
-                    {/* <Image
-                        style={{width: 120, height: 120, resizeMode: "contain"}}
-                        source={{uri: item.image}}
-                    />
-                    <Text style={tw `mt-2 text-lg font-semibold`}>{item.title}</Text> */}
+                <View style={tw `${(!textInputs.length || (textInputs.length>=1 && !checker())) && "opacity-20"}`}>
                     <Icon
                     style={tw `rounded-full`}
                     name="chevron-forward-circle-outline"
                     type="ionicon"
                     colors="white"
-                    size={60}
+                    size={80}
                 /> 
                 </View>
             </TouchableOpacity>

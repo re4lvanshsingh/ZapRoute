@@ -94,6 +94,7 @@ async function nearestNeighborTSP(inputs) {
     a['distance']=distance;
     a['time']=time;
     a['color']=getRandomColor();
+    path[0].color=a['color'];
     path.push(a);
 
     return path;

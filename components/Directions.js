@@ -22,7 +22,7 @@ const Directions = () => {
     return (
       <View style={styles.item}>
         {/* <Text>Current: {item.current.text} - Next: {item.next.text} : Distance {parseFloat((item.next.distance/1000).toFixed(1))}, Time {parseFloat((item.next.time/60).toFixed(1))}</Text> */}
-        <CityDrawer currentCity={item.current.text} nextCity={item.next.text} distance={item.next.distance} time={item.next.time} color={item.next.color}/>
+        <CityDrawer currentCity={item.current.text} nextCity={item.next.text} distance={item.next.distance} time={item.next.time} currentColor={item.current.color} nextColor={item.next.color}/>
       </View>
     );
   };
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   item: {
     paddingVertical: 20,
