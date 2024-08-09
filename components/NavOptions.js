@@ -29,12 +29,7 @@ const NavOptions = ({sendDataToBackend,textInputs}) => {
     };
 
   return (
-    <FlatList
-        data={data}
-        horizontal
-        keyExtractor={(item) => item.id}
-        renderItem={({item}) => (
-            <TouchableOpacity
+    <TouchableOpacity
             onPress={combine}
             disabled={!textInputs.length || (textInputs.length>=1 && !checker())}
             >
@@ -48,8 +43,6 @@ const NavOptions = ({sendDataToBackend,textInputs}) => {
                 /> 
                 </View>
             </TouchableOpacity>
-        )}
-    />
   )
 }
 

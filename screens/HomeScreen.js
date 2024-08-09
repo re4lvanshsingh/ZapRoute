@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, KeyboardAvoidingView,ScrollView } from 'react-native'
 import React,{useRef,useState,useEffect,createRef} from 'react'
 import tw from 'twrnc';
 import NavOptions from '../components/NavOptions.js';
@@ -94,9 +94,10 @@ const HomeScreen = () => {
             const requestData = {
                 inputs: textInputs.map(({ id, latitude, longitude, text }) => ({ id, latitude, longitude, text }))
             };
-    
+            console.log(requestData);
+            
             // Send the combined data to the backend
-            const response = await fetch('http://192.168.1.99:3000', {
+            const response = await fetch('https://zaproute.onrender.com', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ const HomeScreen = () => {
             dispatch(setVisitOrder(responseData));
 
             //To check the TSP path obtained:
-            // console.log(responseData);
+            console.log(responseData);
         } catch (error) {
             console.error('Error sending data to backend:', error);
         }
@@ -221,6 +222,8 @@ const renderItem = ({ item }) => (
             {/* This is for the options section - Ride / Get Food (future addition) */}
         </View>
 
+        <ScrollView>
+
         <View style={{flex:1}}>
         <FlatList
       data={textInputs}
@@ -244,10 +247,11 @@ const renderItem = ({ item }) => (
       </View>
 
     
-      <View style={{position:'relative', paddingBottom:ScreenHeight*0.15, alignContent:'center',paddingLeft:ScreenWidth*0.4}}>
+      <View style={{position:'relative', paddingBottom:ScreenHeight*0.15, alignContent:'center',paddingLeft:ScreenWidth*0.01}}>
       <NavOptions sendDataToBackend={sendDataToBackend} textInputs={textInputs}/>
+      
     </View>
-
+    </ScrollView>
 
         {/***********************************************************************************************************/}
       {/*Dealing with backend*/}
